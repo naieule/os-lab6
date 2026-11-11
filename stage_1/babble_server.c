@@ -27,7 +27,7 @@ int random_delay_activated;
 command_t * command_buffer[BUFFER_SIZE];
 int count_cmd = 0, in=0, out=0;
 sem_t empty_count, full_count, mutex;
-mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_client_count = PTHREAD_MUTEX_INITIALIZER;
 int client_count = 0;
 static void display_help(char *exec)
 {
