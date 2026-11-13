@@ -44,25 +44,24 @@
 
 ## 5.1.1 - 2.a
 
-> FOLLOW: read received client and writing on the followed's client_bundle
-> PUBLISH: writing on client_bundle of received client (cl) and all its followers, update for disconnected client of cl
-> TIMELINE: reading timeline and clearing it on the client_bundle
+**FOLLOW:** read received client and writing on the followed's client_bundle
+**PUBLISH:** writing on client_bundle of received client (cl) and all its followers, update for disconnected client of cl
+**TIMELINE:** reading timeline and clearing it on the client_bundle
 
-For the independent requests of multiple client threads to run in parallel, there is the need of a lock per client. To implement this we chose to use mutexes saved in a struct (lock_struct) with both the lock and the client key. This structures are saved in a buffer (buffer_lock).
+For the independent requests of multiple client threads to run in parallel, there is the need of a lock per client. To implement this we chose to use mutexes that are saved in a struct (lock_struct) with both the initialized lock and the client key. These structures are saved in a buffer (buffer_lock), and initialized beforehand.
 
 We didn't choose read-writer locks as they wouldn't do much benefit since all operations are basically writing operations.
 
 There is also the need to use a mutex to synchronize action on the buffer_lock.
 
-There are 3 operations with the need for client locks and, consequently, the buffer_lock. 
+There are 3 operations with using client locks and, consequently, the buffer_lock:
 
-(1) When a client is created we take the following steps:
-(i) Create structure for the lock while initializing it
-(ii) Adding this struct to the 1st available spot in buffer_lock
+**(A)** When a client is created we take the following steps:
+(i) Associate client to lock in buffer_lock
 
-(2) When locking a client,
+**(B)** When locking a client,
 (i) We look for the lock of the corresponding client on the buffer, searching by its key
-(ii) We take in the lock as a variable and use it to lock and unlock
+(ii) We take in the lock and use it to lock and unlock
 
-(3) When a client is removed
-
+**(3)** When a client is removed
+(i) The key associated to the lock by the struct is reset to 0
