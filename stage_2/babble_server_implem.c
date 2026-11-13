@@ -407,12 +407,12 @@ int run_timeline_command(command_t *cmd, answer_t **answer)
     }
 
     /* client lock */
-    int idx = find_client_lock(client->key);
-    pthread_mutex_lock(&buffer_lock[idx].lock);
+    int cl_idx = find_client_lock(client->key);
+    pthread_mutex_lock(&buffer_lock[cl_idx].lock);
 
     timeline_generate_summary(client->timeline, answer);
 
-    pthread_mutex_unlock(&buffer_lock[idx].lock);
+    pthread_mutex_unlock(&buffer_lock[cl_idx].lock);
 
     return 0;
 }
@@ -484,6 +484,10 @@ int unregisted_client(command_t *cmd)
 {
     assert(cmd->cid == UNREGISTER);
     
+    /* disassociate client lock */
+    int cl_idx = find_client_lock(cmd->key);
+    buffer_lock[cl_idx].key = 0;
+
     /* remove client */
     client_bundle_t *client = registration_remove(cmd->key);
     
