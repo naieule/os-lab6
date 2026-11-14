@@ -44,9 +44,11 @@
 
 ## 5.1.1 - 2.a
 
-**FOLLOW:** read received client and writing on the followed's client_bundle
-**PUBLISH:** writing on client_bundle of received client (cl) and all its followers, update for disconnected client of cl
-**TIMELINE:** reading timeline and clearing it on the client_bundle
+**FOLLOW:** reads received client and writes on the followed's client_bundle.
+
+**PUBLISH:** writes on the client_bundle of received client (cl) and all its followers, updates disconnected clients of cl.
+
+**TIMELINE:** reads timeline and clears it on the client_bundle.
 
 For the independent requests of multiple client threads to run in parallel, there is the need of a lock per client. To implement this we chose to use mutexes that are saved in a struct (lock_struct) with both the initialized lock and the client key. These structures are saved in a buffer (buffer_lock), and initialized beforehand.
 
@@ -56,12 +58,8 @@ There is also the need to use a mutex to synchronize action on the buffer_lock.
 
 There are 3 operations with using client locks and, consequently, the buffer_lock:
 
-**(A)** When a client is created we take the following steps:
-(i) Associate client to lock in buffer_lock
+**(A)** When a client is created: **(i)** the client is associated to a lock in buffer_lock.
 
-**(B)** When locking a client,
-(i) We look for the lock of the corresponding client on the buffer, searching by its key
-(ii) We take in the lock and use it to lock and unlock
+**(B)** When doing one of the operations above, to lock a client: **(i)** we look for the lock of the corresponding client in the buffer, searching by its key; **(ii)** we take in the lock and use it to lock and unlock.
 
-**(3)** When a client is removed
-(i) The key associated to the lock by the struct is reset to 0
+**(C)** When a client is removed: **(i)** the key associated to the lock by the struct lock_struct_t is reset to 0.
