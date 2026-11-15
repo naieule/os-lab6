@@ -1,0 +1,43 @@
+== NAMES ==
+ABED Nayel
+FARIA DE ALMEIDA CASALEIRO Flor
+
+
+== STAGE 1 ==
+
+Concurrency issues and solutions:
+- The command buffer, as a consumer-producer problem. 
+- The registration table, as reader-writer problem.
+
+Additional information:
+
+Tests:
+Stage 1 passed all the tests follow, performance and stress, with streaming, and no known bugs. For the stress test, the bottleneck of the number of clients is not MAX_CLIENT (babble_config.h) but NTHREADS_COMM (babble_server.c).
+
+
+== STAGE 2 ==
+
+Concurrency issues:
+1. Operations FOLLOW (reads received client info and writes on the followed client_bundle), TIMELINE (reads timeline and clears it in client_bundle) and PUBLISH (writes on the timeline of the publisher client (cl) and all its followers, then updates disconnected clients of cl).
+
+Solutions:
+1. For the independent requests of multiple client threads to run in parallel, there is the need for a lock per client. To implement this we chose to use mutexes that are saved in a structure (lock_struct) that keeps both the already initialized mutex and the associated client key (initialized with 0 on the start of the server). These structures are saved in a buffer (buffer_lock). We didn't choose read-writer locks as they wouldn't do much benefit since all operations are mostly writing operations. There is also the need to use a mutex to synchronize interactions with buffer_lock. There are 3 different instances which use client locks and, consequently, the buffer_lock:
+a. When a client is created we associate its client key to a lock in buffer_lock (through the lock_struct), in the first position of the buffer found with the key set to 0.
+b. When locking a client, we first look for the lock of the corresponding client on the buffer, searching by its key, and secondly, we use the mutex to lock and unlock.
+c. When a client is removed, the key associated to the lock by is reset to 0.
+
+Additional information:
+
+Tests: stage 2 passed all the tests follow, performance and stress, with streaming, and no known bugs.
+
+
+== FEEDBACK ==
+
+Feedback section including any suggestions you would have to improve this lab.
+
+* A short description of each concurrency issue that you have identified.
+* A few words about the solution that you designed to solve it (Note that a simple
+figure is sometimes better than a long paragraph).
+* Any additional information that you consider necessary to understand your code.
+* A list of tests that you pass successfully, and the known bugs if any.
+* A brief description of the new tests that you have designed, if any (bonus).
