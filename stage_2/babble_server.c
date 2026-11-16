@@ -19,8 +19,8 @@
 #include "babble_server_answer.h"
 #include "fastrand.h"
 
-#define BUFFER_SIZE 50
-#define NTHREADS_COMM 50
+#define BUFFER_SIZE MAX_CLIENT
+#define NTHREADS_COMM MAX_CLIENT
 
 /* to activate random delays in the processing of messages */
 int random_delay_activated;
