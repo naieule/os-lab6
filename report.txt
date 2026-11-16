@@ -13,7 +13,7 @@ Solutions:
 1. -
 2. Solved with a read-write lock, for accessing the table.
 
-Tests: Stage 1 passed all the tests follow, performance and stress, with streaming, and no known bugs. For the stress test, the bottleneck of the number of clients is not MAX_CLIENT (babble_config.h) but NTHREADS_COMM (babble_server.c).
+Tests: Stage 1 passed all the tests follow, performance and stress, with streaming, and no known bugs.
 
 
 == STAGE 2 ==
