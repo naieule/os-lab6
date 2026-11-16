@@ -10,7 +10,7 @@ Concurrency issues:
 2. The registration table, as reader-writer problem.
 
 Solutions:
-1. -
+1. Solved by using semaphores and mutexes to access the command buffer as seen in class for the consumer producer buffer. Each time a command is to be executed, it is first produced and put into the buffer and then it's consumed.
 2. Solved with a read-write lock, for accessing the table.
 
 Tests: Stage 1 passed all the tests follow, performance and stress, with streaming, and no known bugs.
